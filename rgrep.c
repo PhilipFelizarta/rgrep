@@ -108,11 +108,15 @@ int rgrep_matches(char *line, char *pattern) {
 		}
 		//For ? modifier
 		if(question_modified(pattern)) {
-			//???
-			//if(*pattern != '.' || *line != *pattern)
-				//line -= sizeof(char);
-			if(*line != *pattern && next_char(line) != *(pattern + 2 * sizeof(char)))
+			//
+			if(*line == *pattern && *line == *(pattern + 2 * sizeof(char)))
+				return rgrep_matches(line, pattern + 2 * sizeof(char));
+			//
+			if(*line != *pattern && *line != *(pattern + 2 * sizeof(char)))
 				return 0;
+			//
+			if(*pattern != '.' && *line != *pattern)
+				line -= sizeof(char);
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
 		}
