@@ -5,6 +5,10 @@ char next_char(char *string) {
 	return *(string + sizeof(char));
 }
 
+char prev_char(char *string) {
+	return *(string - sizeof(char));
+}
+
 void inc_char() {
 	
 }
@@ -26,13 +30,19 @@ int is_operator(char pattern) {
 }
 
 int plus_modified(char *pattern) {
-	if(*(pattern + sizeof(char)) == '+')
+	if(next_char(pattern) == '+')
 		return 1;
 	return 0;
 }
 
 int question_modified(char *pattern) {
-	if(*(pattern + sizeof(char)) == '\?')
+	if(next_char(pattern)  == '\?')
+		return 1;
+	return 0;
+}
+
+int escape_modified(char *pattern) {
+	if(prev_char(pattern) == '\\')
 		return 1;
 	return 0;
 }
@@ -49,13 +59,16 @@ int matches_leading(char *line, char *pattern) {
 		return 1;
 	}
 	//Check wildcard match
-	if(*pattern == '.' && *(pattern - sizeof(char)) != '\\') {
+	if(*pattern == '.' && !escape_modified(pattern)) {
 		return 1;
 	}
 	//Check escaped operator match
-	if(*line == *pattern && is_operator(*pattern) && *(pattern - sizeof(char)) == '\\') {
+	if(*line == *pattern && is_operator(*pattern) && escape_modified(pattern)) {
 		return 1;
 	}
+	//Check for absent case of ? operator
+	if(question_modified(pattern))
+		return 1;
 	return 0;
 }
 
@@ -84,19 +97,26 @@ int rgrep_matches(char *line, char *pattern) {
 
 	//Check for match
 	if(matches_leading(line, pattern)) {
+		//For + modifier
 		if(plus_modified(pattern)) {
+			//Go to next nonmatching character
+			//Stops one before because there is a line increment at the end of rgrep_matches
 			while(*(line + sizeof(char)) == *pattern)
 				line += sizeof(char);
+			//Compensate for the character that the operator took
 			pattern += sizeof(char);
 		}
+		//For ? modifier
 		if(question_modified(pattern)) {
+			//???
+			if(*pattern != '.' || *line != *pattern)
+				line -= sizeof(char);
+			if(*line != *pattern && next_char(line) != *(pattern + 2 * sizeof(char)))
+				return 0;
+			//Compensate for the character that the operator took
 			pattern += sizeof(char);
 		}
 		pattern += sizeof(char);
-	}
-
-	else if(question_modified(pattern)) {	
-		pattern += 2 * sizeof(char);
 	}
 
 	line += sizeof(char);
