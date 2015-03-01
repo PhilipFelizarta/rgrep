@@ -99,15 +99,24 @@ int rgrep_matches(char *line, char *pattern) {
 	if(matches_leading(line, pattern)) {
 		//For + modifier
 		if(plus_modified(pattern)) {
+			int chars_before = 1;
+			if(*pattern == *(pattern + 2 * sizeof(char)))
+				chars_before = 2;
 			//Go to next nonmatching character
 			//Stops one before because there is a line increment at the end of rgrep_matches
-			while(*(line + sizeof(char)) == *pattern)
+			while(*(line + chars_before * sizeof(char)) == *pattern)
 				line += sizeof(char);
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
 		}
 		//For ? modifier
 		if(question_modified(pattern)) {
+			//
+			if(*pattern == '.' && !escape_modified(pattern) && *line == *(pattern + 2 * sizeof(char)))
+				return rgrep_matches(line, pattern + 2 * sizeof(char));
+			//
+			if(*pattern == '.' && !escape_modified(pattern) && *line != *(pattern + 2 * sizeof(char)))
+				return rgrep_matches(line + sizeof(char), pattern + 2 * sizeof(char));
 			//
 			if(*line == *pattern && *line == *(pattern + 2 * sizeof(char)))
 				return rgrep_matches(line, pattern + 2 * sizeof(char));
@@ -118,7 +127,7 @@ int rgrep_matches(char *line, char *pattern) {
 			if(*line != *pattern && *line != *(pattern + 2 * sizeof(char)))
 				return 0;
 			//
-			if(*pattern != '.' && *line != *pattern)
+			if(!(*pattern == '.' && !escape_modified(pattern)) || *line != *pattern)
 				line -= sizeof(char);
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
