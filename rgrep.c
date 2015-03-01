@@ -112,6 +112,9 @@ int rgrep_matches(char *line, char *pattern) {
 			if(*line == *pattern && *line == *(pattern + 2 * sizeof(char)))
 				return rgrep_matches(line, pattern + 2 * sizeof(char));
 			//
+			if(*line == *pattern && next_char(line) != *(pattern + 2 * sizeof(char)) && *line != *(pattern + 2 * sizeof(char)))
+				return 0;
+			//
 			if(*line != *pattern && *line != *(pattern + 2 * sizeof(char)))
 				return 0;
 			//
