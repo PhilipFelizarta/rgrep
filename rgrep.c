@@ -109,8 +109,8 @@ int rgrep_matches(char *line, char *pattern) {
 		//For ? modifier
 		if(question_modified(pattern)) {
 			//???
-			if(*pattern != '.' || *line != *pattern)
-				line -= sizeof(char);
+			//if(*pattern != '.' || *line != *pattern)
+				//line -= sizeof(char);
 			if(*line != *pattern && next_char(line) != *(pattern + 2 * sizeof(char)))
 				return 0;
 			//Compensate for the character that the operator took
