@@ -2,7 +2,7 @@
 #define MAXSIZE 4096
 
 char next_char(char *string) {
-	return *(string += sizeof(char));
+	return *(string + sizeof(char));
 }
 
 void inc_char() {
@@ -23,6 +23,18 @@ int is_operator(char pattern) {
 		default :
 			return 0;
 	}
+}
+
+int plus_modified(char *pattern) {
+	if(*(pattern + sizeof(char)) == '+')
+		return 1;
+	return 0;
+}
+
+int question_modified(char *pattern) {
+	if(*(pattern + sizeof(char)) == '\?')
+		return 1;
+	return 0;
 }
 
 /**
@@ -65,12 +77,27 @@ int rgrep_matches(char *line, char *pattern) {
 
 
 	//Check for escape
-	if((*pattern == '\\') && is_operator(*(pattern + sizeof(char))))
+	if((*pattern == '\\') && is_operator(next_char(pattern)))
 		pattern += sizeof(char);
 
+
+
 	//Check for match
-	if(matches_leading(line, pattern))
+	if(matches_leading(line, pattern)) {
+		if(plus_modified(pattern)) {
+			while(*(line + sizeof(char)) == *pattern)
+				line += sizeof(char);
+			pattern += sizeof(char);
+		}
+		if(question_modified(pattern)) {
+			pattern += sizeof(char);
+		}
 		pattern += sizeof(char);
+	}
+
+	else if(question_modified(pattern)) {	
+		pattern += 2 * sizeof(char);
+	}
 
 	line += sizeof(char);
 
