@@ -9,10 +9,6 @@ char prev_char(char *string) {
 	return *(string - sizeof(char));
 }
 
-void inc_char() {
-	
-}
-
 //Accepts char, not pointer
 int is_operator(char pattern) {
 	switch(pattern) {
