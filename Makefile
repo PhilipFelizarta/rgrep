@@ -39,7 +39,7 @@ check: clean rgrep
 	test "`echo "0" | ./rgrep '1+'`" = ""
 	test "`echo "1" | ./rgrep '1+'`" = "1"
 	test "`echo "22" | ./rgrep '2+'`" = "22"
-	test "`echo "333" | ./rgrep '33\?3'`" = "333"
-	test "`echo "4444" | ./rgrep '444\?44'`" = "4444"
+	test "`echo "333" | ./rgrep '33?3'`" = "333"
+	test "`echo "4444" | ./rgrep '444?44'`" = "4444"
 	@echo "Passed sanity check."
 
