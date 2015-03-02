@@ -35,5 +35,11 @@ check: clean rgrep
 	test "`echo "22" | ./rgrep '2+'`" = "22"
 	test "`echo "333" | ./rgrep '33?3'`" = "333"
 	test "`echo "4444" | ./rgrep '444?44'`" = "4444"
+	test "`echo "fine.txt\nreallylong.txt\nabc.txt\ns.txt\nope.pdf" | ./rgrep '...+\.txt'`" = "fine.txt\nreallylong.txt\nabc.txt"
+	test "`echo "aaaaa" | ./rgrep 'a+'`" = "aaaaa"
+	test "`echo "hidden\nhidin\nhbdwen\nhadbn" | ./rgrep 'h.d..?n'`" = "hidden\nhidin\nhdbwen\nhadbn"
+	test "`echo "theyre\nthere\theere\ntherre" | ./rgrep 'they?re'`" = "theyre\nthere"
+	test "`echo "cut\cuut\ncu.t" | ./rgrep 'cu\.?t'`" = "cut\ncu.t"
+	test "`echo "ab\naab\aaab" | ./rgrep 'a?ab+'`" = "aab\naaab"
 	@echo "Passed sanity check."
 
