@@ -1,2 +1,108 @@
-printf "Basic Tests: "
-expr "`echo "" | ./rgrep ''`" = ""
+echo Sanity Check:
+expr "`echo "a" | ./rgrep 'a'`" = "a"
+expr "`echo "b" | ./rgrep 'a'`" = ""
+expr "`echo "c" | ./rgrep 'a'`" = ""
+expr "`echo "a" | ./rgrep '...'`" = ""
+expr "`echo "abc" | ./rgrep '.b.'`" = "abc"
+expr "`echo "h" | ./rgrep 'a+h'`" = ""
+expr "`echo "aaaaah" | ./rgrep 'a+h'`" = "aaaaah"
+expr "`echo "h" | ./rgrep 'aa+h++'`" = ""
+expr "`echo "aaaaahhhhh" | ./rgrep 'aa+hh+'`" = "aaaaahhhhh"
+expr "`echo "" | ./rgrep 'aa+hh+'`" = ""
+expr "`echo "a" | ./rgrep 'a?a'`" = "a"
+expr "`echo "woot" | ./rgrep 'wo?t'`" = ""
+expr "`echo "wot" | ./rgrep 'wo?t'`" = "wot"
+expr "`echo "wat" | ./rgrep 'wo?t'`" = ""
+expr "`echo "CCCCCCC" | ./rgrep '.\+\+'`" = ""
+expr "`echo "C+" | ./rgrep '.\+\+'`" = ""
+expr "`echo "C++" | ./rgrep '.\+\+'`" = "C++"
+expr "`echo "GG" | ./rgrep '.+'`" = "GG"
+expr "`echo "woooooo_CSE31.jpg" | ./rgrep 'w.+_...31\.jpg'`" = "woooooo_CSE31.jpg" 
+
+
+
+echo Examples:
+
+printf "\ta+\n"
+printf "\t\t"
+expr "`echo "a" | ./rgrep 'a+'`" = "a"
+printf "\t\t"
+expr "`echo "aa" | ./rgrep 'a+'`" = "aa"
+printf "\t\t"
+expr "`echo "aaa" | ./rgrep 'a+'`" = "aaa"
+
+printf "\t.+\n"
+printf "\t\t"
+expr "`echo "text" | ./rgrep '.+'`" = "text"
+printf "\t\t"
+expr "`echo "" | ./rgrep '.+'`" = ""
+
+# \\+
+
+printf "\ta?b+\n"
+printf "\t\t"
+expr "`echo "b" | ./rgrep 'a?b+'`" = "b"
+printf "\t\t"
+expr "`echo "ab" | ./rgrep 'a?b+'`" = "ab"
+printf "\t\t"
+expr "`echo "aab" | ./rgrep 'a?b+'`" = "aab"
+printf "\t\t"
+expr "`echo "abb" | ./rgrep 'a?b+'`" = "abb"
+printf "\t\t"
+expr "`echo "aaaaabbbbb" | ./rgrep 'a?b+'`" = "aaaaabbbbb"
+
+printf "\t\\\?\n"
+printf "\t\t"
+expr "`echo "?" | ./rgrep '\?'`" = "?"
+printf "\t\t"
+expr "`echo "!" | ./rgrep '\?'`" = ""
+
+printf "\tthey?re\n"
+printf "\t\t"
+expr "`echo "theyre" | ./rgrep 'they?re'`" = "theyre"
+printf "\t\t"
+expr "`echo "there" | ./rgrep 'they?re'`" = "there"
+printf "\t\t"
+expr "`echo "theere" | ./rgrep 'they?re'`" = ""
+printf "\t\t"
+expr "`echo "therre" | ./rgrep 'they?re'`" = ""
+
+printf "\th.d..?n\n"
+printf "\t\t"
+expr "`echo "hidden" | ./rgrep 'h.d..?n'`" = "hidden"
+printf "\t\t"
+expr "`echo "hidin" | ./rgrep 'h.d..?n'`" = "hidin"
+printf "\t\t"
+expr "`echo "hbdwen" | ./rgrep 'h.d..?n'`" = "hbdwen"
+printf "\t\t"
+expr "`echo "hadbn" | ./rgrep 'h.d..?n'`" = "hadbn"
+
+printf "\tcu\.?t\n"
+printf "\t\t"
+expr "`echo "cut" | ./rgrep 'cu\.?t'`" = "cut"
+printf "\t\t"
+expr "`echo "cu.t" | ./rgrep 'cu\.?t'`" = "cu.t"
+printf "\t\t"
+expr "`echo "cuut" | ./rgrep 'cu\.?t'`" = ""
+
+
+
+printf "Contiguity: "
+expr "`echo "abcdef" | ./rgrep 'adef'`" = ""
+
+echo Escaped operators:
+expr "`echo "." | ./rgrep '\.'`" = "."
+expr "`echo "?" | ./rgrep '\?'`" = "?"
+
+
+# printf "Escaped period: "
+# expr "`echo "." | ./rgrep '\.'`" = "."
+
+# printf "Escaped plus sign: "
+# expr "`echo "+" | ./rgrep '\+'`" = "+"
+
+# printf "Escaped question mark: "
+# expr "`echo "?" | ./rgrep '\?'`" = "?"
+
+# printf "Escaped backslash: "
+# expr "`echo "\" | ./rgrep '\\'`" = "\"
