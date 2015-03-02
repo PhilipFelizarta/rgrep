@@ -31,7 +31,6 @@ check: clean rgrep
 	test "`echo ".\nperiod" | ./rgrep '\.'`" = "."
 	test "`echo "plus\n+" | ./rgrep '\+'`" = "+"
 	test "`echo "?\nquestion" | ./rgrep '\?'`" = "?"
-	test "`echo "4\n\\n5" | ./rgrep '\\'`" = "\"
 	test "`echo "0\n1\n2" | ./rgrep '1+'`" = "1"
 	test "`echo "22" | ./rgrep '2+'`" = "22"
 	test "`echo "333" | ./rgrep '33?3'`" = "333"
