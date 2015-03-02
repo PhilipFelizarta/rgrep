@@ -76,6 +76,8 @@ int matches_leading(char *line, char *pattern) {
  */
 int rgrep_matches(char *line, char *pattern) {
 
+	static int pattern_depth = 0;
+
 	//Base cases
 	if(*line == '\0')
 		return 0;
@@ -86,8 +88,10 @@ int rgrep_matches(char *line, char *pattern) {
 
 
 	//Check for escape
-	if((*pattern == '\\') && is_operator(next_char(pattern)))
+	if((*pattern == '\\') && is_operator(next_char(pattern))) {
 		pattern += sizeof(char);
+		pattern_depth++;
+	}
 
 
 
@@ -102,8 +106,15 @@ int rgrep_matches(char *line, char *pattern) {
 			//Stops one before because there is a line increment at the end of rgrep_matches
 			while(*(line + chars_before * sizeof(char)) == *pattern && !(*pattern == '.' && !escape_modified(pattern)))
 				line += sizeof(char);
+			//Handle .+
+			if(*pattern == '.') {
+				char wildcard = *line;
+				while(*(line + chars_before * sizeof(char)) == wildcard)
+					line += sizeof(char);			
+			}
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
+			pattern_depth++;
 		}
 		//For ? modifier
 		if(question_modified(pattern)) {
@@ -111,24 +122,36 @@ int rgrep_matches(char *line, char *pattern) {
 			if(*pattern == '.' && !escape_modified(pattern) && *line == *(pattern + 2 * sizeof(char)))
 				return rgrep_matches(line, pattern + 2 * sizeof(char));
 			//
-			if(*pattern == '.' && !escape_modified(pattern) && *line != *(pattern + 2 * sizeof(char)))
+			else if(*pattern == '.' && !escape_modified(pattern) && *line != *(pattern + 2 * sizeof(char)))
 				return rgrep_matches(line + sizeof(char), pattern + 2 * sizeof(char));
 			//
-			if(*line == *pattern && *line == *(pattern + 2 * sizeof(char)))
+			else if(*line == *pattern && *line == *(pattern + 2 * sizeof(char)))
 				return rgrep_matches(line, pattern + 2 * sizeof(char));
 			//
-			if(*line == *pattern && next_char(line) != *(pattern + 2 * sizeof(char)) && *line != *(pattern + 2 * sizeof(char)))
+			else if(*line == *pattern && next_char(line) == *(pattern + 2 * sizeof(char))){}
+			//
+			else if(*line == *pattern && next_char(line) != *(pattern + 2 * sizeof(char)) && *line != *(pattern + 2 * sizeof(char)))
+				{}//return 0;
+			//
+			else if(*line != *pattern && *line != *(pattern + 2 * sizeof(char)))
 				return 0;
 			//
-			if(*line != *pattern && *line != *(pattern + 2 * sizeof(char)))
-				return 0;
+			else if(*line == *pattern && *pattern == '.' && escape_modified(pattern)){} 	
 			//
-			if(!(*pattern == '.' && !escape_modified(pattern)) || *line != *pattern)
+			else if(!(*pattern == '.' && !escape_modified(pattern)) || *line != *pattern)
 				line -= sizeof(char);
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
+			pattern_depth++;
 		}
 		pattern += sizeof(char);
+		pattern_depth++;
+	}
+
+	//Reset the pattern on partial match so that we only get contiguous matches
+	else if(pattern_depth != 0) {
+		pattern -= pattern_depth * sizeof(char);
+		pattern_depth -= pattern_depth;
 	}
 
 	line += sizeof(char);
