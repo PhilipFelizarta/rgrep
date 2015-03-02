@@ -104,7 +104,7 @@ int rgrep_matches(char *line, char *pattern) {
 				chars_before = 2;
 			//Go to next nonmatching character
 			//Stops one before because there is a line increment at the end of rgrep_matches
-			while(*(line + chars_before * sizeof(char)) == *pattern)
+			while(*(line + chars_before * sizeof(char)) == *pattern && !(*pattern == '.' && !escape_modified(pattern)))
 				line += sizeof(char);
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);

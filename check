@@ -1,5 +1,5 @@
 echo Sanity Check:
-expr "`echo "a\nb\nc" | ./rgrep 'a'`" = grep 'a'
+expr "`echo "a\nb\nc" | ./rgrep 'a'`" = "a"
 expr "`echo "a\n" | ./rgrep 'a'`" = "a"
 expr "`echo "a" | ./rgrep '...'`" = ""
 expr "`echo "abc" | ./rgrep '.b.'`" = "abc"
