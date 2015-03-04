@@ -149,7 +149,7 @@ int rgrep_matches(char *line, char *pattern) {
 	}
 
 	//Reset the pattern on partial match so that we only get contiguous matches
-	else if(pattern_depth != 0) {
+	else if(pattern_depth != 0 && *(pattern - pattern_depth * sizeof(char)) != '\0') {
 		pattern -= pattern_depth * sizeof(char);
 		pattern_depth -= pattern_depth;
 	}
