@@ -100,6 +100,7 @@ int rgrep_matches(char *line, char *pattern) {
 	if(*line == '\n') {
 		pattern -= pattern_depth * sizeof(char);
 		pattern_depth -= pattern_depth;
+		return 0;
 	}
 
 	//Check for escape
