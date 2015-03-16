@@ -119,10 +119,14 @@ int rgrep_matches(char *line, char *pattern) {
 			while(*(line + chars_before * sizeof(char)) == *pattern && !(*pattern == '.' && !escape_modified(pattern)))
 				line += sizeof(char);
 			//Handle .+
-			if(*pattern == '.') {
+			if(*pattern == '.' && escape_modified(pattern)) {
 				char wildcard = *line;
 				while(*(line + chars_before * sizeof(char)) == wildcard)
 					line += sizeof(char);			
+			}
+			if(*pattern == '.' && !escape_modified(pattern)) {
+				while(*(line + chars_before * sizeof(char)) != *(pattern + 2 * sizeof(char)))
+					line += sizeof(char);
 			}
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
@@ -177,7 +181,8 @@ int rgrep_matches(char *line, char *pattern) {
 		pattern_depth -= pattern_depth;
 	}
 
-	line += sizeof(char);
+	if(*line != '\n')
+		line += sizeof(char);
 
 
 
