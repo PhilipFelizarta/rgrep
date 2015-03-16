@@ -19,8 +19,6 @@ expr "`echo "C++" | ./rgrep '.\+\+'`" = "C++"
 expr "`echo "GG" | ./rgrep '.+'`" = "GG"
 expr "`echo "woooooo_CSE31.jpg" | ./rgrep 'w.+_...31\.jpg'`" = "woooooo_CSE31.jpg" 
 
-
-
 echo Examples:
 
 printf "\ta+\n"

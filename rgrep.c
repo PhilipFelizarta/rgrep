@@ -78,14 +78,26 @@ int rgrep_matches(char *line, char *pattern) {
 
 	static int pattern_depth = 0;
 
+
+
 	//Base cases
 	if(*line == '\0')
 		return 0;
 
-	if(*pattern == '\0')
+	if(*pattern == '\0') {
+	//Reset pattern for new line	
+		if(*line == '\n') {
+			pattern -= pattern_depth * sizeof(char);
+			pattern_depth -= pattern_depth;
+		}
 		return 1;
-
-
+	}
+	
+	//Reset pattern for new line	
+	if(*line == '\n') {
+		pattern -= pattern_depth * sizeof(char);
+		pattern_depth -= pattern_depth;
+	}
 
 	//Check for escape
 	if((*pattern == '\\') && is_operator(next_char(pattern))) {
@@ -119,14 +131,25 @@ int rgrep_matches(char *line, char *pattern) {
 		//For ? modifier
 		if(question_modified(pattern)) {
 			//
-			if(*pattern == '.' && !escape_modified(pattern) && *line == *(pattern + 2 * sizeof(char)))
-				return rgrep_matches(line, pattern + 2 * sizeof(char));
+			if (*pattern == '.' && !escape_modified(pattern) && escape_modified(pattern + 3 * sizeof(char)) && *line == *(pattern + 3 * sizeof(char)) && *(line + sizeof(char)) != *(pattern + 3 * sizeof(char))) {
+				pattern_depth += 4;
+				return rgrep_matches(line + sizeof(char), pattern + 4 * sizeof(char));
+			}
 			//
-			else if(*pattern == '.' && !escape_modified(pattern) && *line != *(pattern + 2 * sizeof(char)))
+			else if(*pattern == '.' && !escape_modified(pattern) && *line == *(pattern + 2 * sizeof(char))) {
+				pattern_depth += 2;
+				return rgrep_matches(line, pattern + 2 * sizeof(char));
+			}
+			//
+			else if(*pattern == '.' && !escape_modified(pattern) && *line != *(pattern + 2 * sizeof(char))) {
+				pattern_depth += 2;
 				return rgrep_matches(line + sizeof(char), pattern + 2 * sizeof(char));
+			}
 			//
-			else if(*line == *pattern && *line == *(pattern + 2 * sizeof(char)))
+			else if(*line == *pattern && *line == *(pattern + 2 * sizeof(char))) {
+				pattern_depth += 2;
 				return rgrep_matches(line, pattern + 2 * sizeof(char));
+			}
 			//
 			else if(*line == *pattern && next_char(line) == *(pattern + 2 * sizeof(char))){}
 			//
