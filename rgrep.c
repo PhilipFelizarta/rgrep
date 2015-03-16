@@ -62,6 +62,9 @@ int matches_leading(char *line, char *pattern) {
 	if(*line == *pattern && is_operator(*pattern) && escape_modified(pattern)) {
 		return 1;
 	}
+	//Check escape character
+	if(*pattern == '\\')
+		return matches_leading(line, pattern + sizeof(char));
 	//Check for absent case of ? operator
 	if(question_modified(pattern))
 		return 1;
@@ -81,11 +84,8 @@ int rgrep_matches(char *line, char *pattern) {
 
 
 	//Base cases
-	if(*line == '\0')
-		return 0;
-
 	if(*pattern == '\0') {
-	//Reset pattern for new line	
+		//Reset pattern for new line	
 		if(*line == '\n') {
 			pattern -= pattern_depth * sizeof(char);
 			pattern_depth -= pattern_depth;
@@ -93,6 +93,9 @@ int rgrep_matches(char *line, char *pattern) {
 		return 1;
 	}
 	
+	if(*line == '\0')
+		return 0;
+
 	//Reset pattern for new line	
 	if(*line == '\n') {
 		pattern -= pattern_depth * sizeof(char);
@@ -125,8 +128,12 @@ int rgrep_matches(char *line, char *pattern) {
 					line += sizeof(char);			
 			}
 			if(*pattern == '.' && !escape_modified(pattern)) {
-				while(*(line + chars_before * sizeof(char)) != *(pattern + 2 * sizeof(char)))
+				//while(*(line + chars_before * sizeof(char)) != *(pattern + 2 * sizeof(char)))
+				while(!matches_leading(line + chars_before * sizeof(char), pattern + 2 * sizeof(char))){
 					line += sizeof(char);
+					if((*line == '\0' || *line == '\n') && *(pattern + 2 * sizeof(char)) != '\0')
+						return 0;
+				}
 			}
 			//Compensate for the character that the operator took
 			pattern += sizeof(char);
@@ -181,10 +188,10 @@ int rgrep_matches(char *line, char *pattern) {
 		pattern_depth -= pattern_depth;
 	}
 
-	if(*line != '\n')
+	//if(*line != '\n')
 		line += sizeof(char);
 
-
+	
 
 	//Recurse
 	return rgrep_matches(line, pattern);
