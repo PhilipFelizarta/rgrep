@@ -88,8 +88,8 @@ int rgrep_matches(char *line, char *pattern) {
 		//Reset pattern for new line	
 		if(*line == '\n') {
 			pattern -= pattern_depth * sizeof(char);
-			pattern_depth -= pattern_depth;
 		}
+		pattern_depth = 0;
 		return 1;
 	}
 	
